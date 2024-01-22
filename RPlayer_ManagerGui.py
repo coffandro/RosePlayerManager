@@ -1,12 +1,14 @@
 import customtkinter
-import RPlayer_GetPlayingInfo as Controller
+import find_serial_port as PortsCom
 import subprocess
 import json
+import time
 
 # SETTING UP WINDOW
 app = customtkinter.CTk()
 
 # SETTING UP VARIABLE(S)
+ComPort = ""
 
 try:
     f = open('Settings.json', "rw")
@@ -18,7 +20,7 @@ try:
     # Closing file
     f.close()
 except:
-    settings = {"multScreens": 0, "optionmenu1": "Media info","optionmenu2": "Media info"}
+    settings = {"comport": "COM5", "multScreens": 0, "optionmenu1": "Media info","optionmenu2": "Media info"}
 # SETTING UP TABVIEW CLASS
 class MyTabView(customtkinter.CTkTabview):
     def __init__(self, master, **kwargs):
@@ -26,9 +28,9 @@ class MyTabView(customtkinter.CTkTabview):
         super().__init__(master, **kwargs)
 
         # create tabs
-        self.add("General settings")
-        self.add("Primary mode")
-        self.add("Secondary mode")
+        tab1 = self.add("General settings")
+        tab2 = self.add("Primary mode")
+        tab3 = self.add("Secondary mode")
         
         # add 'master=self.tab("Primary mode")' or 'master=self.tab("Secondary mode")' to any master
         
@@ -38,9 +40,24 @@ class MyTabView(customtkinter.CTkTabview):
             settings["multScreens"] = int(self.switch_var.get())
             print("switch toggled, current value:", settings["multScreens"])
             if settings["multScreens"] == 0:
-                self.configure(self.tab("Secondary mode"), state="disabled")
+                self.delete("Secondary mode")
+            elif settings["multScreens"] == 1:
+                self.insert(2, "Secondary mode")
 
-        self.switch_var = customtkinter.StringVar(value="on")
+        def optionmenu_callback01(choice):
+            global settings
+            global ComPort
+            
+
+            print("optionmenu02 dropdown clicked:", choice)
+            settings = {
+                "comport" : OptionsList01Short[OptionsList01.index(choice)],
+                "optionmenu1": self.optionmenu02.get(),
+                "optionmenu2": self.optionmenu03.get()
+            }
+            print(settings)
+
+        self.switch_var = customtkinter.StringVar(value=True)
         self.switch = customtkinter.CTkSwitch(
             master=self.tab("General settings"),
             text="Two modes",
@@ -48,22 +65,41 @@ class MyTabView(customtkinter.CTkTabview):
             variable=self.switch_var,
             onvalue=True,
             offvalue=False)
+        self.switch.select()
         
+        OptionsList01 = PortsCom.GetSerialPorts()
+        OptionsList01Short = PortsCom.GetShortenedSerialPorts()
+        
+        #for i in PortsCom.GetSerialPorts():
+        #    OptionsList01.append(i)
+        #for i in PortsCom.GetShortenedSerialPorts():
+        #    OptionsList01Short.append(i)
+
+        self.optionmenu_var01 = customtkinter.StringVar(value=OptionsList01[-1])
+        self.optionmenu01 = customtkinter.CTkOptionMenu(
+            master=self.tab("General settings"),
+            command=optionmenu_callback01,
+            values=OptionsList01,
+            variable=self.optionmenu_var01)
+
+        self.optionmenu01.grid(row=1, column=1, padx=20, pady=10)
         self.switch.grid(row=0, column=0, padx=20, pady=10)
         
+        
         # Primary menu
-        def optionmenu_callback01(choice):
+        def optionmenu_callback02(choice):
             global settings
-            print("optionmenu01 dropdown clicked:", choice)
+            print("optionmenu02 dropdown clicked:", choice)
             settings = {
-                "optionmenu1": self.optionmenu01.get(),
-                "optionmenu2": self.optionmenu02.get()
+                "comport" : ComPort,
+                "optionmenu1": self.optionmenu02.get(),
+                "optionmenu2": self.optionmenu03.get()
             }
             print(settings)
         
         
-        self.optionmenu_var01 = customtkinter.StringVar(value=settings["optionmenu1"])
-        self.optionmenu01 = customtkinter.CTkOptionMenu(
+        self.optionmenu_var02 = customtkinter.StringVar(value=settings["optionmenu1"])
+        self.optionmenu02 = customtkinter.CTkOptionMenu(
             master=self.tab("Primary mode"),
             values=[
                 "Media info",
@@ -71,33 +107,34 @@ class MyTabView(customtkinter.CTkTabview):
                 "Option 3"
             ],
             command=optionmenu_callback01,
-            variable=self.optionmenu_var01)
+            variable=self.optionmenu_var02)
         
-        self.optionmenu01.grid(row=0, column=0, padx=20, pady=10)
+        self.optionmenu02.grid(row=0, column=0, padx=20, pady=10)
         
         # Second Menu
         
-        def optionmenu_callback02(choice):
+        def optionmenu_callback03(choice):
             global settings
-            print("optionmenu02 dropdown clicked:", choice)
+            print("optionmenu03 dropdown clicked:", choice)
             settings = {
-                "optionmenu1": self.optionmenu01.get(),
-                "optionmenu2": self.optionmenu02.get()
+                "comport" : ComPort,
+                "optionmenu1": self.optionmenu02.get(),
+                "optionmenu2": self.optionmenu03.get()
             }
             print(settings)
 
-        self.optionmenu_var02 = customtkinter.StringVar(value=settings["optionmenu2"])
-        self.optionmenu02 = customtkinter.CTkOptionMenu(
+        self.optionmenu_var03 = customtkinter.StringVar(value=settings["optionmenu2"])
+        self.optionmenu03 = customtkinter.CTkOptionMenu(
             master=self.tab("Secondary mode"),
             values=[
                 "Media info",
                 "option 2",
                 "option 3"
             ],
-            command=optionmenu_callback02,
-            variable=self.optionmenu_var02)
+            command=optionmenu_callback03,
+            variable=self.optionmenu_var03)
         
-        self.optionmenu02.grid(row=0, column=0, padx=20, pady=10)
+        self.optionmenu03.grid(row=0, column=0, padx=20, pady=10)
 
 # SETTING UP APP
 class App(customtkinter.CTk):
@@ -123,6 +160,10 @@ class App(customtkinter.CTk):
             json.dump(settings, f)
     
     def apply_button_callbck(self):
+        global settings
+        print(settings)
+        with open('Settings.json', 'w') as f:
+            json.dump(settings, f)
         subprocess.run(["python", "RPlayer_ControllerCom.py"])
 
 if __name__ == '__main__':

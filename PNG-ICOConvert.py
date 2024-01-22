@@ -1,9 +1,13 @@
 from PIL import Image, ImageFilter
-from os import listdir
+import os
 from re import findall
 
-for filename in listdir("Icons"):
-    if filename.endswith(".png"):
+for filename in os.listdir("Icons"):
+    if filename.endswith(".ico"):
+        removal = "Icons/" + filename
+        print("Removed: " + removal)
+        os.remove(removal)
+    elif filename.endswith(".png"):
         size = findall(r'\d+',filename)[0]
         size = int(size)
         print(size)

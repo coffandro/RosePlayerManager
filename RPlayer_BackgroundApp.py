@@ -13,7 +13,7 @@ try:
     # Closing file
     f.close()
 except:
-    settings = {"optionmenu1": "Media info","optionmenu2": "Media info"}
+    settings = {"comport": "COM5", "multScreens": 0, "optionmenu1": "Media info","optionmenu2": "Media info"}
 try:
     f = open('Media.json')
 

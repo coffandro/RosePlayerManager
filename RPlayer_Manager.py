@@ -6,8 +6,6 @@ import sys
 import getopts
 import asyncio
 
-
-
 # SETTING UP ICON
 
 image = Image.open("Icons/Rose256.png")

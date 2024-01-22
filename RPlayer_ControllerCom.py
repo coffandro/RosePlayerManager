@@ -16,10 +16,9 @@ try:
     # Closing file
     f.close()
 except:
-    settings = {"optionmenu1": "Media info","optionmenu2": "Media info"}
+    settings = {"comport": "COM5", "multScreens": 0, "optionmenu1": "Media info","optionmenu2": "Media info"}
 
-
-ser = serial.Serial('COM5', 115200)  # open serial port
+ser = serial.Serial(settings["comport"], 115200)  # open serial port
 
 Data = {}
 
