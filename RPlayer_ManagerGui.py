@@ -3,6 +3,7 @@ import find_serial_port as PortsCom
 import subprocess
 import json
 import time
+import RPlayer_Settings as Settings
 
 # SETTING UP WINDOW
 app = customtkinter.CTk()
@@ -10,17 +11,8 @@ app = customtkinter.CTk()
 # SETTING UP VARIABLE(S)
 ComPort = ""
 
-try:
-    f = open('Settings.json', "rw")
+settings = Settings.LoadSettings()
 
-    # returns JSON object as
-    # a dictionary
-    settings = json.load(f)
-
-    # Closing file
-    f.close()
-except:
-    settings = {"comport": "COM5", "multScreens": 0, "optionmenu1": "Media info","optionmenu2": "Media info"}
 # SETTING UP TABVIEW CLASS
 class MyTabView(customtkinter.CTkTabview):
     def __init__(self, master, **kwargs):
@@ -48,7 +40,6 @@ class MyTabView(customtkinter.CTkTabview):
             global settings
             global ComPort
             
-
             print("optionmenu02 dropdown clicked:", choice)
             settings = {
                 "comport" : OptionsList01Short[OptionsList01.index(choice)],
@@ -155,9 +146,6 @@ class App(customtkinter.CTk):
         
     def save_button_callbck(self):
         global settings
-        print(settings)
-        with open('Settings.json', 'w') as f:
-            json.dump(settings, f)
     
     def apply_button_callbck(self):
         global settings
