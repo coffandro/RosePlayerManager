@@ -1,6 +1,9 @@
 from PIL import Image, ImageFilter
 import os
+import sys
 from re import findall
+
+arg = sys.argv[1]
 
 for filename in os.listdir(arg):
     if filename.endswith(".ico"):
