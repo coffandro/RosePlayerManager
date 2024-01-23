@@ -10,7 +10,7 @@ for filename in os.listdir(arg):
         removal = arg + filename
         print("Removed: " + removal)
         os.remove(removal)
-    elif filename.endswith(arg):
+    elif filename.endswith(".png"):
         size = findall(r"\d+", filename)[0]
         size = int(size)
         print(size)
