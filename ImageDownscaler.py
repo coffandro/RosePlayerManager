@@ -1,20 +1,23 @@
 from PIL import Image, ImageFilter
 import os
 import sys
-from re import findall
 
 arg = sys.argv[1]
-ScaleX = sys.argv[2]
-ScaleY = sys.argv[3]
+ScaleX = int(sys.argv[2])
+ScaleY = int(sys.argv[3])
 
 for filename in os.listdir(arg):
-    if filename.endswith(".png"):
-        logo = Image.open(arg + filename)
+    if filename.endswith("FR.png"):
+        os.remove(arg + filename.replace("FR.png", ".png"))
+        print(filename)
+        img = Image.open(arg + filename)
+        print(img)
 
-        logo = logo.thumbnail((ScaleX, ScaleY))
+        newsize = (ScaleX, ScaleY)
+        img.thumbnail(newsize)
 
-        logo.save(
-            arg + filename,
+        img.save(
+            arg + filename.replace("FR.png", ".png"),
             format="PNG",
-            sizes=[(sizeX, sizeY)],
+            sizes=[(ScaleX, ScaleY)],
         )
