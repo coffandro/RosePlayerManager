@@ -2,3 +2,6 @@ __pycache__/
 .venv/
 RosePlayerManager.code-workspace
 *.ico
+dist/
+build/
+*.spec
