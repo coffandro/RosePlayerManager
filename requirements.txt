@@ -1,5 +1,4 @@
 Pillow
-PyInstaller
 colorama
 customtkinter
 pystray

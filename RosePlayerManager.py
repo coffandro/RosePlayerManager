@@ -5,6 +5,16 @@ import getopt
 import pystray
 from PIL import Image
 
+
+def IsBundled():
+    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+        return True
+    else:
+        return False
+
+
+print("Is bundled: " + str(IsBundled()))
+
 args = sys.argv[1:]
 image = Image.open("Icons/Rose256.png")
 hidden = False
