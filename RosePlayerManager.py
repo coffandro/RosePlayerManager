@@ -53,12 +53,12 @@ def HelpFunc():
     )
     print(Fore.BLUE + "")
     print("-h for help")
-    print("-H or --hidden to start the app in the tray")
+    print("-S or --shown to start the app with the window open")
     print("-m to get the media output" + Fore.RESET)
 
 
 try:
-    opts, args = getopt.getopt(args, "hHm", ["hidden"])
+    opts, args = getopt.getopt(args, "hSm", ["shown"])
 except getopt.GetoptError:
     print("Use -h for help")
     HelpFunc()
@@ -67,14 +67,14 @@ except getopt.GetoptError:
 for opt, arg in opts:
     if opt == "-h":
         state = "Help"
-    elif opt in ("-H", "--hidden"):
-        state = "Hidden"
+    elif opt in ("-S", "--shown"):
+        state = "Shown"
     elif opt == "-m":
         state = "Media"
 
 if state == "Help":
     HelpFunc()
-elif state != "Hidden":
+elif state == "Shown":
     app = GUI.App()
     app.mainloop()
     icon.run()
