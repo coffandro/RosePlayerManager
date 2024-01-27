@@ -2,3 +2,5 @@ Pillow
 colorama
 customtkinter
 pystray
+pyserial
+winsdk

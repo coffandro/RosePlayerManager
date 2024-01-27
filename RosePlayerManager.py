@@ -1,6 +1,7 @@
 import sys
 from colorama import Fore
 import RosePlayerGUI as GUI
+import RosePlayerPlaying as Playing
 import getopt
 import pystray
 from PIL import Image
@@ -17,7 +18,7 @@ print("Is bundled: " + str(IsBundled()))
 
 args = sys.argv[1:]
 image = Image.open("Icons/Rose256.png")
-hidden = False
+state = ""
 
 
 def after_click(icon, query):
@@ -65,19 +66,19 @@ except getopt.GetoptError:
 
 for opt, arg in opts:
     if opt == "-h":
-        HelpFunc()
-        sys.exit(0)
+        state = "Help"
     elif opt in ("-H", "--hidden"):
-        hidden = True
+        state = "Hidden"
     elif opt == "-m":
-        print("Media output")
-        sys.exit(0)
-    else:
-        hidden = False
+        state = "Media"
 
-if hidden == False:
+if state == "Help":
+    HelpFunc()
+elif state != "Hidden":
     app = GUI.App()
     app.mainloop()
     icon.run()
+elif state == "Media":
+    print(Playing.GetPlaying())
 else:
     icon.run()

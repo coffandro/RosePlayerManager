@@ -31,6 +31,9 @@ class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
 
+        self.iconbitmap("Icons/Rose256.ico")
+        self.title("Rose Player Manager")
+
         self.RosePlayerImage = customtkinter.CTkImage(
             light_image=Image.open("Images/RosePlayerLight.png"),
             dark_image=Image.open("Images/RosePlayerDark.png"),

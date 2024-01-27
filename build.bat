@@ -14,7 +14,7 @@ python -m pip install -U pyinstaller
 python ICOConvert.py Icons/
 python ImageDownscaler.py Images/ 1920 1080
 
-pyinstaller --noconfirm --onedir --add-data "Icons/*;." "RosePlayerManager.py"
+pyinstaller --noconfirm --onedir --icon "Icons/Rose256.ico" --add-data "Icons/*;." "RosePlayerManager.py"
 
 call .venv\Scripts\deactivate.bat
 
