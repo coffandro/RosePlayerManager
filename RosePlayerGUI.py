@@ -1,4 +1,5 @@
 import customtkinter
+import RosePlayerPlaying as Playing
 from PIL import Image
 
 
@@ -7,12 +8,30 @@ class ScreenManagement(customtkinter.CTkTabview):
         super().__init__(master, **kwargs)
 
         # create tabs
-        self.add("Screen 1")
-        self.add("Screen 2")
+        self.add("Primary mode")
+        self.add("Secondary mode")
 
-        # add widgets on tabs
-        self.label = customtkinter.CTkLabel(master=self.tab("Screen 1"))
-        self.label.grid(row=0, column=0, padx=20, pady=10)
+        # create functions
+        def ModeMenu1(choice):
+            print("optionmenu dropdown clicked:", choice)
+
+        # add widgets on Primary mode
+        self.label = customtkinter.CTkLabel(
+            master=self.tab("Primary mode"),
+            text="What should be displayed in the primary mode?",
+        )
+
+        self.optionmenu = customtkinter.CTkOptionMenu(
+            master=self.tab("Primary mode"),
+            values=["option 1", "option 2"],
+            command=ModeMenu1,
+        )
+        self.optionmenu.set("option 2")
+
+        self.optionmenu.grid(row=1, column=0, columnspan=2, padx=20)
+        self.label.grid(row=0, column=0, columnspan=2, padx=20, pady=10)
+
+        # add widgets on Secondary mode
 
 
 class GeneralManagement(customtkinter.CTkTabview):
@@ -50,9 +69,7 @@ class App(customtkinter.CTk):
         self.ScreenTabs.grid(row=0, column=1, padx=10, pady=10)
 
         self.SettingsTabs = GeneralManagement(master=self)
-        self.SettingsTabs.grid(
-            row=1, columnspan=2, column=0, padx=1, pady=10, ipadx=250
-        )
+        self.SettingsTabs.grid(row=1, columnspan=2, column=0, padx=1, pady=10)
 
 
 if __name__ == "__main__":
