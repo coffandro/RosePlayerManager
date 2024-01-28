@@ -1,5 +1,6 @@
 import customtkinter
 import RosePlayerPlaying as Playing
+import RosePlayerPorts as Ports
 from PIL import Image
 
 
@@ -37,6 +38,12 @@ class ScreenManagement(customtkinter.CTkTabview):
 class GeneralManagement(customtkinter.CTkTabview):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
+
+        OptionsList01 = Ports.GetSerialPorts()
+        OptionsList01Short = Ports.GetShortenedSerialPorts()
+
+        print(OptionsList01)
+        print(OptionsList01Short)
 
         # create tabs
         self.add("General Settings")
