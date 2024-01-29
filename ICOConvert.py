@@ -4,6 +4,8 @@ import sys
 from re import findall
 
 arg = sys.argv[1]
+print("dir: " + arg)
+arg = arg.replace("\r", "")
 
 for filename in os.listdir(arg):
     if filename.endswith(".ico"):
