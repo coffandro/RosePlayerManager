@@ -2,26 +2,7 @@ import json
 import serial
 import sys
 import time
-import RPlayer_GetPlayingInfo as MediaGetter
 import asyncio
-
-# Read Settings
-try:
-    f = open("Settings.json")
-
-    # returns JSON object as
-    # a dictionary
-    settings = json.load(f)
-
-    # Closing file
-    f.close()
-except:
-    settings = {
-        "comport": "COM5",
-        "multScreens": 0,
-        "optionmenu1": "Media info",
-        "optionmenu2": "Media info",
-    }
 
 ser = serial.Serial(settings["comport"], 115200)  # open serial port
 

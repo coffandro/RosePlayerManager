@@ -1,6 +1,8 @@
 import customtkinter
 import RosePlayerPlaying as Playing
 import RosePlayerPorts as Ports
+
+# import RosePlayerSettings as Settings
 from PIL import Image
 
 
@@ -13,7 +15,7 @@ class ScreenManagement(customtkinter.CTkTabview):
         self.add("Secondary mode")
 
         # create functions
-        def ModeMenu1(choice):
+        def ModeMenu2(choice):
             print("optionmenu dropdown clicked:", choice)
 
         # add widgets on Primary mode
@@ -25,7 +27,7 @@ class ScreenManagement(customtkinter.CTkTabview):
         self.optionmenu = customtkinter.CTkOptionMenu(
             master=self.tab("Primary mode"),
             values=["option 1", "option 2"],
-            command=ModeMenu1,
+            command=ModeMenu2,
         )
         self.optionmenu.set("option 2")
 
@@ -39,18 +41,54 @@ class GeneralManagement(customtkinter.CTkTabview):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
 
-        OptionsList01 = Ports.GetSerialPorts()
-        OptionsList01Short = Ports.GetShortenedSerialPorts()
+        # create variables
+        self.OptionsList = Ports.GetSerialPorts()
+        self.OptionsListShort = Ports.GetShortenedSerialPorts()
+        self.CurrentPort = self.OptionsListShort[-1]
 
-        print(OptionsList01)
-        print(OptionsList01Short)
+        # create functions
+        def ModeMenu1(choice):
+            self.CurrentPort = self.OptionsListShort[self.OptionsList.index(choice)]
+            print("index:", self.CurrentPort)
+
+        def TestConnectionButton():
+            Test = Ports.TestSerialPorts(self.CurrentPort)
+            if Test == True:
+                self.TestLabel.configure(text="This is a Rose Player")
+            else:
+                self.TestLabel.configure(text="This is not a Rose Player")
 
         # create tabs
         self.add("General Settings")
 
+        # create widgets
+        self.TestLabel = customtkinter.CTkLabel(
+            self.tab("General Settings"), text="Not tested"
+        )
+
+        self.ExplainLabel = customtkinter.CTkLabel(
+            self.tab("General Settings"), text="Select and find a port to connect to"
+        )
+
+        self.TestButton = customtkinter.CTkButton(
+            self.tab("General Settings"),
+            text="Test port",
+            command=lambda: TestConnectionButton(),
+        )
+
+        self.OptionmenuVar = customtkinter.StringVar(value=self.OptionsList[-1])
+        self.OptionMenu = customtkinter.CTkOptionMenu(
+            master=self.tab("General Settings"),
+            command=ModeMenu1,
+            values=self.OptionsList,
+            variable=self.OptionmenuVar,
+        )
+
         # add widgets on tabs
-        self.label = customtkinter.CTkLabel(master=self.tab("General Settings"))
-        self.label.grid(row=0, column=0, padx=20, pady=10)
+        self.ExplainLabel.grid(row=0, column=0, padx=20)
+        self.OptionMenu.grid(row=1, column=0, padx=20)
+        self.TestButton.grid(row=2, column=0, padx=20)
+        self.TestLabel.grid(row=3, column=0, padx=20)
 
 
 class App(customtkinter.CTk):
