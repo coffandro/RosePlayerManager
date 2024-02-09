@@ -5,16 +5,33 @@ import RosePlayerPorts as Ports
 # import RosePlayerSettings as Settings
 from PIL import Image
 
+# global variables
+MultipleScreens = 1
+
 
 class ScreenManagement(customtkinter.CTkTabview):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
-
         # create tabs
         self.add("Primary mode")
+        # if MultipleScreens == 1:
         self.add("Secondary mode")
 
         # create functions
+        def CheckScreenAmount():
+            if MultipleScreens == 1:
+                # couldn't find a "proper" way to check if the tab is present lol
+                try:
+                    self.tab("Secondary mode")
+                except:
+                    self.add("Secondary mode")
+            else:
+                try:
+                    self.delete("Secondary mode")
+                except:
+                    pass
+            self.after(100, CheckScreenAmount)
+
         def ModeMenu2(choice):
             print("optionmenu dropdown clicked:", choice)
 
@@ -36,6 +53,9 @@ class ScreenManagement(customtkinter.CTkTabview):
 
         # add widgets on Secondary mode
 
+        # refresh
+        CheckScreenAmount()
+
 
 class GeneralManagement(customtkinter.CTkTabview):
     def __init__(self, master, **kwargs):
@@ -49,7 +69,6 @@ class GeneralManagement(customtkinter.CTkTabview):
         # create functions
         def ModeMenu1(choice):
             self.CurrentPort = self.OptionsListShort[self.OptionsList.index(choice)]
-            print("index:", self.CurrentPort)
 
         def TestConnectionButton():
             Test = Ports.TestSerialPorts(self.CurrentPort)
@@ -58,20 +77,28 @@ class GeneralManagement(customtkinter.CTkTabview):
             else:
                 self.TestLabel.configure(text="This is not a Rose Player")
 
+        def CheckboxEvent():
+            global MultipleScreens
+            if self.CheckVar.get() == "off":
+                MultipleScreens = 0
+            else:
+                MultipleScreens = 1
+
         # create tabs
         self.add("General Settings")
 
         # create widgets
         self.TestLabel = customtkinter.CTkLabel(
-            self.tab("General Settings"), text="Not tested"
+            master=self.tab("General Settings"), text="Not tested"
         )
 
         self.ExplainLabel = customtkinter.CTkLabel(
-            self.tab("General Settings"), text="Select and find a port to connect to"
+            master=self.tab("General Settings"),
+            text="Select and find a port to connect to",
         )
 
         self.TestButton = customtkinter.CTkButton(
-            self.tab("General Settings"),
+            master=self.tab("General Settings"),
             text="Test port",
             command=lambda: TestConnectionButton(),
         )
@@ -84,11 +111,23 @@ class GeneralManagement(customtkinter.CTkTabview):
             variable=self.OptionmenuVar,
         )
 
+        self.CheckVar = customtkinter.StringVar(value="on")
+        self.Checkbox = customtkinter.CTkCheckBox(
+            master=self.tab("General Settings"),
+            text="Multiple displays",
+            command=CheckboxEvent,
+            variable=self.CheckVar,
+            onvalue="on",
+            offvalue="off",
+        )
+
         # add widgets on tabs
         self.ExplainLabel.grid(row=0, column=0, padx=20)
         self.OptionMenu.grid(row=1, column=0, padx=20)
         self.TestButton.grid(row=2, column=0, padx=20)
         self.TestLabel.grid(row=3, column=0, padx=20)
+
+        self.Checkbox.grid(row=1, column=1, padx=20)
 
 
 class App(customtkinter.CTk):
@@ -101,7 +140,7 @@ class App(customtkinter.CTk):
         self.RosePlayerImage = customtkinter.CTkImage(
             light_image=Image.open("Images/RosePlayerLight.png"),
             dark_image=Image.open("Images/RosePlayerDark.png"),
-            size=(640, 360),
+            size=(720, 360),
         )
 
         self.image_label = customtkinter.CTkLabel(
