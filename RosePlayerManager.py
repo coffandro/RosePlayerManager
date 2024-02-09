@@ -6,8 +6,6 @@ import getopt
 import pystray
 from PIL import Image
 
-print("uwu")
-
 
 def IsBundled():
     if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
