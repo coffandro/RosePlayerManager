@@ -1,7 +1,6 @@
 import customtkinter
 import RosePlayerPlaying as Playing
-import RosePlayerPorts as Ports
-
+import RosePlayerFuncs as Global
 # import RosePlayerSettings as Settings
 from PIL import Image
 
@@ -62,8 +61,8 @@ class GeneralManagement(customtkinter.CTkTabview):
         super().__init__(master, **kwargs)
 
         # create variables
-        self.OptionsList = Ports.GetSerialPorts()
-        self.OptionsListShort = Ports.GetShortenedSerialPorts()
+        self.OptionsList = Global.GetSerialPorts()
+        self.OptionsListShort = Global.GetShortenedSerialPorts()
         self.CurrentPort = self.OptionsListShort[-1]
 
         # create functions
@@ -71,7 +70,7 @@ class GeneralManagement(customtkinter.CTkTabview):
             self.CurrentPort = self.OptionsListShort[self.OptionsList.index(choice)]
 
         def TestConnectionButton():
-            Test = Ports.TestSerialPorts(self.CurrentPort)
+            Test = Global.TestSerialPorts(self.CurrentPort)
             if Test == True:
                 self.TestLabel.configure(text="This is a Rose Player")
             else:
@@ -134,7 +133,10 @@ class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
 
-        self.iconbitmap("Icons/Rose256.ico")
+        if Global.IsBundled():
+            self.iconbitmap("_internal/Icons/Rose256.ico")
+        else:    
+            self.iconbitmap("Icons/Rose256.ico")
         self.title("Rose Player Manager")
 
         self.RosePlayerImage = customtkinter.CTkImage(

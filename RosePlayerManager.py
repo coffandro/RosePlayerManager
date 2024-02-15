@@ -4,22 +4,16 @@ import RosePlayerGUI as GUI
 import RosePlayerPlaying as Playing
 import getopt
 import pystray
+import RosePlayerFuncs as Global
 from PIL import Image
 
 
-def IsBundled():
-    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
-        return True
-    else:
-        return False
-
-
-print("Is bundled: " + str(IsBundled()))
-
 args = sys.argv[1:]
-image = Image.open("Icons/Rose256.png")
+if Global.IsBundled():
+    image = Image.open("_internal/Icons/Rose256.png")
+else:
+    image = Image.open("Icons/Rose256.png")
 state = ""
-
 
 def after_click(icon, query):
     if str(query) == "Open":
@@ -28,7 +22,6 @@ def after_click(icon, query):
     elif str(query) == "Exit":
         icon.stop()
         sys.exit(0)
-
 
 icon = pystray.Icon(
     "Rose Player Manager",

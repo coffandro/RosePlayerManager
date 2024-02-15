@@ -1,10 +1,14 @@
-import serial.tools.list_ports
-import serial
-import time
-import sys
+# Global functions
+def IsBundled():
+    import sys
+    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+        return True
+    else:
+        return False
 
-
+# Ports functions
 def GetSerialPorts():
+    import serial.tools.list_ports
     list = []
     for i in serial.tools.list_ports.comports():
         if "Intel(R) Active Management Technology" in str(i):
@@ -15,6 +19,7 @@ def GetSerialPorts():
 
 
 def GetRobotSerialPorts():
+    import serial.tools.list_ports
     list = []
     for i in serial.tools.list_ports.comports():
         if "Intel(R) Active Management Technology" in str(i):
@@ -25,6 +30,7 @@ def GetRobotSerialPorts():
 
 
 def GetShortenedSerialPorts():
+    import serial.tools.list_ports
     list = []
     for i in serial.tools.list_ports.comports():
         if "Intel(R) Active Management Technology" in str(i):
@@ -36,11 +42,13 @@ def GetShortenedSerialPorts():
 
 
 def TestSerialPorts(port):
-    ser = serial.Serial(port, 115200, timeout=1, write_timeout=1)  # open serial port
-
-    timeout = time.time() + 3  # 5 Seconds from now
-
+    import serial
+    import time 
     try:
+        ser = serial.Serial(port, 115200, timeout=1, write_timeout=1)  # open serial port
+
+        timeout = time.time() + 3  # 5 Seconds from now
+        
         command = b"a\n\r"
         ser.write(command)  # write a string
 
@@ -69,13 +77,45 @@ def TestSerialPorts(port):
             return True
         else:
             return False
-    except serial.SerialTimeoutException:
-        ser.close()
+    except:
         return False
+
+# Settings functions
+import json
+
+
+def Read_Settings():
+    import json
+    # Read Settings
+    try:
+        f = open("Settings.json")
+
+        # returns JSON object as
+        # a dictionary
+        settings = json.load(f)
+
+        # Closing file
+        f.close()
+    except:
+        settings = {
+            "comport": "COM5",
+            "multScreens": 1,
+            "optionmenu1": "Media info",
+            "optionmenu2": "Media info",
+        }
+
+    return settings
+
+
+def Write_Settings(settings):
+    import json
+    with open("Settings.json", "w") as f:
+        json.dump(settings, f)
 
 
 if __name__ == "__main__":
-    print(GetShortenedSerialPorts())
-    print(GetSerialPorts())
-    print(GetRobotSerialPorts())
-    print(TestSerialPorts(sys.argv[1]))
+    print("Is bundled:     ", str(IsBundled()))
+    print("Short ports:    ", GetShortenedSerialPorts())
+    print("Normal ports:   ", GetSerialPorts())
+    print("Robot ports:    ", GetRobotSerialPorts())
+    print("COM4 Roseplayer:", TestSerialPorts("com4"))
