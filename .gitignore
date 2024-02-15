@@ -5,3 +5,4 @@ RosePlayerManager.code-workspace
 dist/
 build/
 *.spec
+*.json

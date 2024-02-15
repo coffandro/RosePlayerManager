@@ -86,9 +86,14 @@ import json
 
 def Read_Settings():
     import json
+    from sys import platform
+    from pathlib import Path
     # Read Settings
     try:
-        f = open("Settings.json")
+        if platform == "linux" or platform == "linux2":
+            f = open(str(Path.home()) + "/.config/RosePlayerManager/Settings.json")
+        elif platform == "win32":
+            f = open(str(Path.home()) + "\\RosePlayerManager\\Settings.json")
 
         # returns JSON object as
         # a dictionary
@@ -109,8 +114,14 @@ def Read_Settings():
 
 def Write_Settings(settings):
     import json
-    with open("Settings.json", "w") as f:
-        json.dump(settings, f)
+    from sys import platform
+    from pathlib import Path
+    if platform == "linux" or platform == "linux2":
+        with open(str(Path.home()) + "/RosePlayerManager/Settings.json", "w") as f:
+            json.dump(settings, f)
+    elif platform == "win32":
+        with open(str(Path.home()) + "\\RosePlayerManager\\Settings.json", "w") as f:
+            json.dump(settings, f)
 
 
 if __name__ == "__main__":
@@ -119,3 +130,6 @@ if __name__ == "__main__":
     print("Normal ports:   ", GetSerialPorts())
     print("Robot ports:    ", GetRobotSerialPorts())
     print("COM4 Roseplayer:", TestSerialPorts("com4"))
+    print(Read_Settings())
+    Write_Settings({"uwu": True})
+    print(Read_Settings())

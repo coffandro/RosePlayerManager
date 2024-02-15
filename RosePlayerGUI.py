@@ -63,7 +63,10 @@ class GeneralManagement(customtkinter.CTkTabview):
         # create variables
         self.OptionsList = Global.GetSerialPorts()
         self.OptionsListShort = Global.GetShortenedSerialPorts()
-        self.CurrentPort = self.OptionsListShort[-1]
+        try:
+            self.CurrentPort = self.OptionsListShort[-1]
+        except IndexError:
+            self.CurrentPort = "No devices connected"
 
         # create functions
         def ModeMenu1(choice):
