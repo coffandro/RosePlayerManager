@@ -41,13 +41,13 @@ def GetShortenedSerialPorts():
     return list
 
 
-def TestSerialPorts(port):
+def TestSerialPort(port):
     import serial
-    import time 
+    import time
     try:
         ser = serial.Serial(port, 115200, timeout=1, write_timeout=1)  # open serial port
 
-        timeout = time.time() + 3  # 5 Seconds from now
+        timeout = time.time() + 2  # 5 Seconds from now
         
         command = b"a\n\r"
         ser.write(command)  # write a string
@@ -103,7 +103,7 @@ def Read_Settings():
         f.close()
     except:
         settings = {
-            "comport": "COM5",
+            "comport": "COM4",
             "multScreens": 1,
             "optionmenu1": "Media info",
             "optionmenu2": "Media info",
@@ -129,7 +129,11 @@ if __name__ == "__main__":
     print("Short ports:    ", GetShortenedSerialPorts())
     print("Normal ports:   ", GetSerialPorts())
     print("Robot ports:    ", GetRobotSerialPorts())
-    print("COM4 Roseplayer:", TestSerialPorts("com4"))
+    for i in GetShortenedSerialPorts():
+        if  TestSerialPorts(i):
+            print("Roseplayer:     ", i)
+        else:
+            print("not Roseplayer:", i)
     print(Read_Settings())
     Write_Settings({"uwu": True})
     print(Read_Settings())
