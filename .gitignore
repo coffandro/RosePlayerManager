@@ -4,4 +4,4 @@ RosePlayerManager.code-workspace
 *.ico
 dist/
 build/
-*.json
+Settings.json

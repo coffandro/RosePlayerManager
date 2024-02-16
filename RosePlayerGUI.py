@@ -1,11 +1,14 @@
 import customtkinter
 import RosePlayerPlaying as Playing
 import RosePlayerFuncs as Global
-# import RosePlayerSettings as Settings
 from PIL import Image
 
 # global variables
 MultipleScreens = 1
+OptionMode1 = "Media info"
+OptionMode2 = "Hacker mode"
+Settings = {}
+Port = ""
 
 
 class ScreenManagement(customtkinter.CTkTabview):
@@ -13,7 +16,6 @@ class ScreenManagement(customtkinter.CTkTabview):
         super().__init__(master, **kwargs)
         # create tabs
         self.add("Primary mode")
-        # if MultipleScreens == 1:
         self.add("Secondary mode")
 
         # create functions
@@ -32,25 +34,46 @@ class ScreenManagement(customtkinter.CTkTabview):
             self.after(100, CheckScreenAmount)
 
         def ModeMenu2(choice):
+            global OptionMode1
             print("optionmenu dropdown clicked:", choice)
+            OptionMode1 = choice
+        
+        def ModeMenu3(choice):
+            global OptionMode2
+            print("optionmenu dropdown clicked:", choice)
+            OptionMode2 = choice
 
         # add widgets on Primary mode
-        self.label = customtkinter.CTkLabel(
+        self.label1 = customtkinter.CTkLabel(
             master=self.tab("Primary mode"),
             text="What should be displayed in the primary mode?",
         )
 
-        self.optionmenu = customtkinter.CTkOptionMenu(
+        self.optionmenu1 = customtkinter.CTkOptionMenu(
             master=self.tab("Primary mode"),
-            values=["option 1", "option 2"],
+            values=["Media info", "Hacker mode", "Option 3"],
             command=ModeMenu2,
         )
-        self.optionmenu.set("option 2")
+        self.optionmenu1.set("Media info")
 
-        self.optionmenu.grid(row=1, column=0, columnspan=2, padx=20)
-        self.label.grid(row=0, column=0, columnspan=2, padx=20, pady=10)
+        self.optionmenu1.grid(row=1, column=0, columnspan=2, padx=20)
+        self.label1.grid(row=0, column=0, columnspan=2, padx=20, pady=10)
 
         # add widgets on Secondary mode
+        self.label2 = customtkinter.CTkLabel(
+            master=self.tab("Secondary mode"),
+            text="What should be displayed in the primary mode?",
+        )
+
+        self.optionmenu2 = customtkinter.CTkOptionMenu(
+            master=self.tab("Secondary mode"),
+            values=["Media info", "Hacker mode", "Option 3"],
+            command=ModeMenu3,
+        )
+        self.optionmenu2.set("Hacker mode")
+
+        self.optionmenu2.grid(row=1, column=0, columnspan=2, padx=20)
+        self.label2.grid(row=0, column=0, columnspan=2, padx=20, pady=10)
 
         # refresh
         CheckScreenAmount()
@@ -73,13 +96,14 @@ class GeneralManagement(customtkinter.CTkTabview):
         # create functions
         def ModeMenu1(choice):
             self.CurrentPortShort = self.OptionsListShort[self.OptionsList.index(choice)]
+            Port = self.CurrentPortShort
 
         def TestConnectionButton():
             if self.CurrentPortShort:
                 Test = Global.TestSerialPorts(self.CurrentPortShort)
             else:
                 self.TestLabel.configure(text="Please connect a device")
-            if Test == True:
+            if Test:
                 self.TestLabel.configure(text="This is a Rose Player")
             else:
                 self.TestLabel.configure(text="This is not a Rose Player")
@@ -136,10 +160,56 @@ class GeneralManagement(customtkinter.CTkTabview):
 
         self.Checkbox.grid(row=1, column=1, padx=20)
 
+class SaveMenu(customtkinter.CTkTabview):
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
+        
+        # create functions
+        def SaveSettings():
+            global Settings
+            global Port
+            global MultipleScreens
+            global OptionMode1
+            global OptionMode2
+
+            Settings = {
+                "comport": Port,
+                "multScreens": MultipleScreens,
+                "optionmenu1": OptionMode1,
+                "optionmenu2": OptionMode2,
+            }
+
+            Global.Write_Settings(Settings)
+        
+        def ApplySettings():
+            Settings = Global.Read_Settings()
+            print(Settings)
+
+        # create tabs
+        self.add("Save menu")
+
+        # create widgets
+        self.SaveButton = customtkinter.CTkButton(
+            master=self.tab("Save menu"),
+            text="Save settings",
+            command=lambda: SaveSettings(),
+        )
+        self.ApplyButton = customtkinter.CTkButton(
+            master=self.tab("Save menu"),
+            text="Apply settings",
+            command=lambda: ApplySettings(),
+        )
+
+        self.SaveButton.grid(row=0, column=0, padx=10)
+        self.ApplyButton.grid(row=0, column=1, padx=10)
 
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
+        customtkinter.set_default_color_theme("dark-red.json")
+
+        self.title("Rose Player Manager")
+
 
         if Global.IsBundled():
             self.iconbitmap("_internal/Icons/Rose256.ico")
@@ -155,11 +225,10 @@ class App(customtkinter.CTk):
                 dark_image=Image.open("Images/RosePlayerDark.png"),
                 size=(720, 360),
             )
-        self.title("Rose Player Manager")
-
+        
         self.image_label = customtkinter.CTkLabel(
             self, image=self.RosePlayerImage, text=""
-        )  # display the Rose player image
+        )
 
         self.image_label.grid(row=0, column=0, padx=10, pady=10)
 
@@ -167,7 +236,10 @@ class App(customtkinter.CTk):
         self.ScreenTabs.grid(row=0, column=1, padx=10, pady=10)
 
         self.SettingsTabs = GeneralManagement(master=self)
-        self.SettingsTabs.grid(row=1, columnspan=2, column=0, padx=1, pady=10)
+        self.SettingsTabs.grid(row=1, column=0, pady=10)
+
+        self.SaveTabs = SaveMenu(master=self)
+        self.SaveTabs.grid(row=1, column=1, pady=10)
 
 
 if __name__ == "__main__":

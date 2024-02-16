@@ -4,7 +4,7 @@ rmdir /S /Q dist
 rmdir /S /Q __pycache__
 :: del /Q RosePlayerManager.spec
 
-:: python -m venv .venv
+python -m venv .venv
 
 call .venv\Scripts\activate.bat
 

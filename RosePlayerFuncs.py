@@ -106,7 +106,7 @@ def Read_Settings():
             "comport": "COM4",
             "multScreens": 1,
             "optionmenu1": "Media info",
-            "optionmenu2": "Media info",
+            "optionmenu2": "Hacker mode",
         }
     
     Write_Settings(settings)
