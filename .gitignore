@@ -4,5 +4,4 @@ RosePlayerManager.code-workspace
 *.ico
 dist/
 build/
-*.spec
 *.json

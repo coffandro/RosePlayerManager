@@ -108,7 +108,8 @@ def Read_Settings():
             "optionmenu1": "Media info",
             "optionmenu2": "Media info",
         }
-
+    
+    Write_Settings(settings)
     return settings
 
 
@@ -134,6 +135,4 @@ if __name__ == "__main__":
             print("Roseplayer:     ", i)
         else:
             print("not Roseplayer:", i)
-    print(Read_Settings())
-    Write_Settings({"uwu": True})
     print(Read_Settings())

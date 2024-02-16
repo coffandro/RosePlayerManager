@@ -64,16 +64,21 @@ class GeneralManagement(customtkinter.CTkTabview):
         self.OptionsList = Global.GetSerialPorts()
         self.OptionsListShort = Global.GetShortenedSerialPorts()
         try:
-            self.CurrentPort = self.OptionsListShort[-1]
+            self.CurrentPort = self.OptionsList[-1]
+            self.CurrentPortShort = self.OptionsListShort[-1]
         except IndexError:
-            self.CurrentPort = "No devices connected"
+            self.CurrentPort = "No valid devices connected"
+            self.CurrentPortShort = ""
 
         # create functions
         def ModeMenu1(choice):
-            self.CurrentPort = self.OptionsListShort[self.OptionsList.index(choice)]
+            self.CurrentPortShort = self.OptionsListShort[self.OptionsList.index(choice)]
 
         def TestConnectionButton():
-            Test = Global.TestSerialPorts(self.CurrentPort)
+            if self.CurrentPortShort:
+                Test = Global.TestSerialPorts(self.CurrentPortShort)
+            else:
+                self.TestLabel.configure(text="Please connect a device")
             if Test == True:
                 self.TestLabel.configure(text="This is a Rose Player")
             else:
@@ -105,7 +110,7 @@ class GeneralManagement(customtkinter.CTkTabview):
             command=lambda: TestConnectionButton(),
         )
 
-        self.OptionmenuVar = customtkinter.StringVar(value=self.OptionsList[-1])
+        self.OptionmenuVar = customtkinter.StringVar(value=self.CurrentPort)
         self.OptionMenu = customtkinter.CTkOptionMenu(
             master=self.tab("General Settings"),
             command=ModeMenu1,
@@ -116,7 +121,7 @@ class GeneralManagement(customtkinter.CTkTabview):
         self.CheckVar = customtkinter.StringVar(value="on")
         self.Checkbox = customtkinter.CTkCheckBox(
             master=self.tab("General Settings"),
-            text="Multiple displays",
+            text="Multiple display modes",
             command=CheckboxEvent,
             variable=self.CheckVar,
             onvalue="on",
@@ -138,15 +143,19 @@ class App(customtkinter.CTk):
 
         if Global.IsBundled():
             self.iconbitmap("_internal/Icons/Rose256.ico")
+            self.RosePlayerImage = customtkinter.CTkImage(
+                light_image=Image.open("_internal/Images/RosePlayerLight.png"),
+                dark_image=Image.open("_internal/Images/RosePlayerDark.png"),
+                size=(720, 360),
+            )
         else:    
             self.iconbitmap("Icons/Rose256.ico")
+            self.RosePlayerImage = customtkinter.CTkImage(
+                light_image=Image.open("Images/RosePlayerLight.png"),
+                dark_image=Image.open("Images/RosePlayerDark.png"),
+                size=(720, 360),
+            )
         self.title("Rose Player Manager")
-
-        self.RosePlayerImage = customtkinter.CTkImage(
-            light_image=Image.open("Images/RosePlayerLight.png"),
-            dark_image=Image.open("Images/RosePlayerDark.png"),
-            size=(720, 360),
-        )
 
         self.image_label = customtkinter.CTkLabel(
             self, image=self.RosePlayerImage, text=""
