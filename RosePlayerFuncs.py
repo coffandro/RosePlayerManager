@@ -1,14 +1,17 @@
 # Global functions
 def IsBundled():
     import sys
+
     if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
         return True
     else:
         return False
 
+
 # Ports functions
 def GetSerialPorts():
     import serial.tools.list_ports
+
     list = []
     for i in serial.tools.list_ports.comports():
         if "Intel(R) Active Management Technology" in str(i):
@@ -20,6 +23,7 @@ def GetSerialPorts():
 
 def GetRobotSerialPorts():
     import serial.tools.list_ports
+
     list = []
     for i in serial.tools.list_ports.comports():
         if "Intel(R) Active Management Technology" in str(i):
@@ -31,6 +35,7 @@ def GetRobotSerialPorts():
 
 def GetShortenedSerialPorts():
     import serial.tools.list_ports
+
     list = []
     for i in serial.tools.list_ports.comports():
         if "Intel(R) Active Management Technology" in str(i):
@@ -44,11 +49,14 @@ def GetShortenedSerialPorts():
 def TestSerialPort(port):
     import serial
     import time
-    try:
-        ser = serial.Serial(port, 115200, timeout=1, write_timeout=1)  # open serial port
 
-        timeout = time.time() + 2  # 5 Seconds from now
-        
+    try:
+        ser = serial.Serial(
+            port, 115200, timeout=1, write_timeout=1
+        )  # open serial port
+
+        timeout = time.time() + 1  # 5 Seconds from now
+
         command = b"a\n\r"
         ser.write(command)  # write a string
 
@@ -80,14 +88,26 @@ def TestSerialPort(port):
     except:
         return False
 
+
 # Settings functions
-import json
+def Write_Settings(settings):
+    import json
+    from sys import platform
+    from pathlib import Path
+
+    if platform == "linux" or platform == "linux2":
+        with open(str(Path.home()) + "/RosePlayerManager/Settings.json", "w") as f:
+            json.dump(settings, f)
+    elif platform == "win32":
+        with open(str(Path.home()) + "\\RosePlayerManager\\Settings.json", "w") as f:
+            json.dump(settings, f)
 
 
 def Read_Settings():
     import json
     from sys import platform
     from pathlib import Path
+
     # Read Settings
     try:
         if platform == "linux" or platform == "linux2":
@@ -103,26 +123,17 @@ def Read_Settings():
         f.close()
     except:
         settings = {
-            "comport": "COM4",
+            "AutoGen": True,
+            "comport": "",
             "multScreens": 1,
+            "MediaDelaySet": False,
+            "MediaDelay": 10000,
+            "MediaDelayFormat": "Sec",
             "optionmenu1": "Media info",
             "optionmenu2": "Hacker mode",
         }
-    
-    Write_Settings(settings)
+
     return settings
-
-
-def Write_Settings(settings):
-    import json
-    from sys import platform
-    from pathlib import Path
-    if platform == "linux" or platform == "linux2":
-        with open(str(Path.home()) + "/RosePlayerManager/Settings.json", "w") as f:
-            json.dump(settings, f)
-    elif platform == "win32":
-        with open(str(Path.home()) + "\\RosePlayerManager\\Settings.json", "w") as f:
-            json.dump(settings, f)
 
 
 if __name__ == "__main__":
@@ -131,8 +142,8 @@ if __name__ == "__main__":
     print("Normal ports:   ", GetSerialPorts())
     print("Robot ports:    ", GetRobotSerialPorts())
     for i in GetShortenedSerialPorts():
-        if  TestSerialPorts(i):
-            print("Roseplayer:     ", i)
+        if TestSerialPort(i):
+            print("Roseplayer:    ", i)
         else:
             print("not Roseplayer:", i)
     print(Read_Settings())

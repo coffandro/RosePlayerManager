@@ -6,7 +6,7 @@ import getopt
 import pystray
 import RosePlayerFuncs as Global
 from PIL import Image
-
+from multiprocessing import Process, Queue, Pipe
 
 args = sys.argv[1:]
 if Global.IsBundled():
@@ -15,6 +15,15 @@ else:
     image = Image.open("Icons/Rose256.png")
 state = ""
 
+Settings = Global.Read_Settings()
+
+for i in Global.GetShortenedSerialPorts():
+    if Global.TestSerialPort(i):
+        Settings["comport"] = i
+
+Global.Write_Settings(Settings)
+
+
 def after_click(icon, query):
     if str(query) == "Open":
         app = GUI.App()
@@ -22,6 +31,7 @@ def after_click(icon, query):
     elif str(query) == "Exit":
         icon.stop()
         sys.exit(0)
+
 
 icon = pystray.Icon(
     "Rose Player Manager",
