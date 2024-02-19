@@ -89,6 +89,16 @@ def TestSerialPort(port):
         return False
 
 
+def Search_Ports():
+    Settings = Read_Settings()
+
+    for i in GetShortenedSerialPorts():
+        if TestSerialPort(i):
+            Settings["comport"] = i
+
+    Write_Settings(Settings)
+
+
 # Settings functions
 def Write_Settings(settings):
     import json
@@ -134,6 +144,11 @@ def Read_Settings():
         }
 
     return settings
+
+
+def Apply_Settings():
+    Settings = Read_Settings()
+    print(Settings)
 
 
 if __name__ == "__main__":

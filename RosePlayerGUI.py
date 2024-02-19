@@ -11,10 +11,53 @@ Settings = Global.Read_Settings()
 class ToplevelWindow(customtkinter.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.geometry("400x300")
 
-        self.label = customtkinter.CTkLabel(self, text="ToplevelWindow")
-        self.label.pack(padx=20, pady=20)
+        # create functions
+        def topmost(window):
+            window.attributes("-topmost", 1)
+            window.attributes("-topmost", 0)
+
+        def Recheck_Function(self):
+            Global.Search_Ports()
+            Settings = Global.Read_Settings()
+            if not Settings["comport"] == "":
+                self.label.configure(text="There is a \nRose Player connected")
+                self.Button1.configure(text="Apply Settings")
+                self.Button1.configure(command=lambda: Global.Apply_Settings())
+
+        def Close(window):
+            Settings = Global.Read_Settings()
+            window.attributes("-topmost", 0)
+            window.attributes("-topmost", 1)
+            window.destroy()
+            print(Settings["comport"])
+
+        self.parent = self.master.master
+
+        self.geometry(f"407x100")
+        self.ws = self.parent.winfo_width()
+        self.hs = self.parent.winfo_height()
+        self.x = self.ws / 2 + 100
+        self.y = self.hs / 2 + 100
+        self.geometry("+%d+%d" % (self.x, self.y))
+
+        self.label = customtkinter.CTkLabel(
+            self, text="There is no \nRose Player connected"
+        )
+        self.Button1 = customtkinter.CTkButton(
+            self, text="Recheck ports", command=lambda: Recheck_Function(self)
+        )
+        self.CancelButton = customtkinter.CTkButton(
+            self, text="Cancel", command=lambda: Close(self)
+        )
+
+        self.label.grid(row=0, column=1)
+        self.CancelButton.grid(row=1, column=0)
+        self.Button1.grid(row=1, column=2)
+
+        self.grab_set()
+
+        self.after(200, lambda: topmost(self))
 
 
 class ScreenManagement(customtkinter.CTkTabview):
@@ -138,13 +181,10 @@ class GeneralManagement(customtkinter.CTkTabview):
             offvalue="0",
         )
 
-        self.MediaDelayLabel1 = customtkinter.CTkLabel(
+        self.MediaDelayLabel = customtkinter.CTkLabel(
             master=self.tab("General Settings"),
             text="Refresh rate:",
             font=("Roboto", 13, "bold"),
-        )
-        self.MediaDelayLabel2 = customtkinter.CTkLabel(
-            master=self.tab("General Settings"), text="Every:"
         )
         self.MediaDelayEntry = customtkinter.CTkEntry(
             master=self.tab("General Settings"),
@@ -180,8 +220,7 @@ class GeneralManagement(customtkinter.CTkTabview):
         # add widgets on tab
         self.Checkbox.grid(row=0, column=0, columnspan=2, padx=10)
 
-        self.MediaDelayLabel1.grid(row=1, column=0, pady=20)
-        # self.MediaDelayLabel2.grid(row=1, column=1, pady=10)
+        self.MediaDelayLabel.grid(row=1, column=0, pady=20)
         self.MediaDelayEntry.grid(row=1, column=1, pady=20)
         self.MediaDelayMenu.grid(row=1, column=2, pady=20)
 
@@ -201,8 +240,6 @@ class SaveMenu(customtkinter.CTkTabview):
 
         def ApplySettings():
             Settings = Global.Read_Settings()
-
-            print(Settings["comport"])
 
             if Settings["comport"] == "":
                 if (
@@ -241,6 +278,14 @@ class App(customtkinter.CTk):
         super().__init__()
 
         self.title("Rose Player Manager")
+        self.geometry("1100x550")
+        self.w = self.winfo_reqwidth()
+        self.h = self.winfo_reqheight()
+        self.ws = self.winfo_screenwidth()
+        self.hs = self.winfo_screenheight()
+        self.x = (self.ws / 4) - (self.w / 4)
+        self.y = (self.hs / 4) - (self.h / 4)
+        self.geometry("+%d+%d" % (self.x, self.y))
 
         if Global.IsBundled():
             self.iconbitmap("_internal/Icons/Rose256.ico")
@@ -266,10 +311,10 @@ class App(customtkinter.CTk):
         self.ScreenTabs = ScreenManagement(master=self)
         self.ScreenTabs.grid(row=0, column=1, padx=10, pady=10)
 
-        self.SettingsTabs = GeneralManagement(master=self)
+        self.SettingsTabs = GeneralManagement(master=self, height=150)
         self.SettingsTabs.grid(row=1, column=0, padx=10, pady=10)
 
-        self.SaveTabs = SaveMenu(master=self)
+        self.SaveTabs = SaveMenu(master=self, height=150)
         self.SaveTabs.grid(row=1, column=1, padx=10, pady=10)
 
 

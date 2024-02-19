@@ -15,13 +15,7 @@ else:
     image = Image.open("Icons/Rose256.png")
 state = ""
 
-Settings = Global.Read_Settings()
-
-for i in Global.GetShortenedSerialPorts():
-    if Global.TestSerialPort(i):
-        Settings["comport"] = i
-
-Global.Write_Settings(Settings)
+Global.Search_Ports()
 
 
 def after_click(icon, query):
