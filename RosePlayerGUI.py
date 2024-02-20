@@ -240,6 +240,7 @@ class SaveMenu(customtkinter.CTkTabview):
 
         def ApplySettings():
             Settings = Global.Read_Settings()
+            Global.Apply_Settings(Settings)
 
             if Settings["comport"] == "":
                 if (
@@ -251,8 +252,8 @@ class SaveMenu(customtkinter.CTkTabview):
                     )  # create window if its None or destroyed
                 else:
                     self.toplevel_window.focus()  # if window exists focus it
-
-            Global.Write_Settings(Settings)
+            else:
+                Global.Apply_Settings()
 
         # create tabs
         self.add("Save menu")

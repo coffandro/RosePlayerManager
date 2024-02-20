@@ -51,35 +51,7 @@ def TestSerialPort(port):
     import time
 
     try:
-        ser = serial.Serial(
-            port, 115200, timeout=1, write_timeout=1
-        )  # open serial port
-
-        timeout = time.time() + 1  # 5 Seconds from now
-
-        command = b"a\n\r"
-        ser.write(command)  # write a string
-
-        ended = False
-        reply = b""
-
-        for _ in range(len(command)):
-            a = ser.read()  # Read the loopback chars and ignore
-
-        while True:
-            if time.time() > timeout:
-                break
-            a = ser.read()
-
-            if a == b"\r":
-                break
-
-            else:
-                reply += a
-
-            time.sleep(0.01)
-
-        ser.close()
+        Send_Serial(port, "a", True)
 
         if reply == b"b":
             return True
@@ -147,8 +119,67 @@ def Read_Settings():
 
 
 def Apply_Settings():
+
+    import serial
+    import time
+    import json
+
     Settings = Read_Settings()
+
+    data = {}
+
+    data["Mode"] = "Setting"
+    data["MultScreen"] = Settings["multScreens"]
+    data["Disp1"] = Settings["optionmenu1"]
+    data["Disp2"] = Settings["optionmenu2"]
+    print(data)
+    data = json.dumps(data)
+    print(data)
+
+    if TestSerialPort(Settings["comport"]):
+        Send_Serial(Settings["comport"], data, False)
+
     print(Settings)
+
+
+def Send_Serial(port, data, ReturnOutput):
+
+    import time
+    import serial
+
+    ser = serial.Serial(port, 115200, timeout=1, write_timeout=1)  # open serial port
+
+    command = f"{data}\n\r".encode("utf-8")
+    print(f"Sending Command: [{command}]")
+    ser.write(command)  # write a string
+
+    ended = False
+    reply = b""
+
+    for _ in range(len(command)):
+        a = ser.read()  # Read the loopback chars and ignore
+
+    if ReturnOutput:
+        timeout = time.time() + 1  # 1 Seconds from now
+
+        while True:
+            if time.time() > timeout:
+                break
+            a = ser.read()
+
+            if a == b"\r":
+                break
+
+            else:
+                reply += a
+
+            time.sleep(0.01)
+
+        ser.close()
+
+        return reply
+    else:
+        ser.close()
 
 
 if __name__ == "__main__":

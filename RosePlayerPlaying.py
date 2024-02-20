@@ -5,30 +5,32 @@ import time
 from sys import platform
 import subprocess
 
-def find_between( s, first, last ):
+
+def find_between(s, first, last):
     try:
-        start = s.index( first ) + len( first )
-        end = s.index( last, start )
+        start = s.index(first) + len(first)
+        end = s.index(last, start)
         return s[start:end]
     except ValueError:
         return ""
 
+
 if platform == "linux" or platform == "linux2":
+
     def get_media_info():
         data = str(subprocess.check_output(["playerctl", "metadata"]))
         info_dict = {}
-        
+
         info_dict["title"] = find_between(data, "xesam:title", "\\").strip()
         info_dict["album_title"] = find_between(data, "xesam:album", "\\").strip()
         info_dict["artist"] = find_between(data, "xesam:artist", "\\").strip()
-        
+
         return info_dict
 
 elif platform == "win32":
     from winsdk.windows.media.control import (
         GlobalSystemMediaTransportControlsSessionManager as MediaManager,
     )
-
 
     async def get_media_info():
         try:
@@ -57,6 +59,7 @@ elif platform == "win32":
         # See references for more information.
         except:
             print("no media")
+
 else:
     print("no media")
 
