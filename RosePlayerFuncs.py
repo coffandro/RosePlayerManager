@@ -212,7 +212,11 @@ def Send_Serial(port, data, ReturnOutput):
         ser.close()
 
 
+OldPlaying = {}
+
+
 def Playback_Service():
+    global OldPlaying
     import RosePlayerPlaying as Playing
     import threading
     import json
@@ -227,9 +231,10 @@ def Playback_Service():
     Data["Album"] = PlayingData["album_title"]
 
     Data = json.dumps(Data)
-
-    Send_Serial(Settings["comport"], Data, False)
-    print(Data)
+    if Data != OldPlaying:
+        OldPlaying = Data
+        Send_Serial(Settings["comport"], Data, False)
+        print(Data)
 
     threading.Timer(Settings["RefreshDelay"], Playback_Service).start()
 

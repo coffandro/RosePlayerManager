@@ -23,7 +23,7 @@ def after_click(icon, query):
         app = GUI.App()
         app.mainloop()
     elif str(query) == "Exit":
-        exit()
+        sys.exit(1)
 
 
 icon = pystray.Icon(
@@ -69,7 +69,8 @@ for opt, arg in opts:
         state = "Media"
 
 Background_Function = threading.Thread(
-    target=Global.Playback_Service, name="Playback Refresh"
+    target=Global.Playback_Service,
+    name="Playback Refresh",
 )
 Background_Function.start()
 
