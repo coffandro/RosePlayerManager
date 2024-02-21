@@ -102,7 +102,10 @@ class ScreenManagement(customtkinter.CTkTabview):
 
         self.optionmenu1 = customtkinter.CTkOptionMenu(
             master=self.tab("Primary mode"),
-            values=["Media info", "Hacker mode", "Option 3"],
+            values=[
+                "Media info",
+                "Hacker mode",
+            ],
             command=ModeMenu1,
         )
         self.optionmenu1.set(Settings["optionmenu1"])
@@ -118,7 +121,7 @@ class ScreenManagement(customtkinter.CTkTabview):
 
         self.optionmenu2 = customtkinter.CTkOptionMenu(
             master=self.tab("Secondary mode"),
-            values=["Media info", "Hacker mode", "Option 3"],
+            values=["Media info", "Hacker mode"],
             command=ModeMenu2,
         )
         self.optionmenu2.set(Settings["optionmenu2"])
