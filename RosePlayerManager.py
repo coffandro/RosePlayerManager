@@ -6,7 +6,7 @@ import getopt
 import pystray
 import RosePlayerFuncs as Global
 from PIL import Image
-from multiprocessing import Process, Queue, Pipe
+import threading
 
 args = sys.argv[1:]
 if Global.IsBundled():
@@ -23,8 +23,7 @@ def after_click(icon, query):
         app = GUI.App()
         app.mainloop()
     elif str(query) == "Exit":
-        icon.stop()
-        sys.exit(0)
+        exit()
 
 
 icon = pystray.Icon(
@@ -68,6 +67,11 @@ for opt, arg in opts:
         state = "Shown"
     elif opt == "-m":
         state = "Media"
+
+Background_Function = threading.Thread(
+    target=Global.Playback_Service, name="Playback Refresh"
+)
+Background_Function.start()
 
 if state == "Help":
     HelpFunc()

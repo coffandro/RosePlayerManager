@@ -51,7 +51,35 @@ def TestSerialPort(port):
     import time
 
     try:
-        Send_Serial(port, "a", True)
+        ser = serial.Serial(
+            port, 115200, timeout=1, write_timeout=1
+        )  # open serial port
+
+        timeout = time.time() + 1  # 5 Seconds from now
+
+        command = b"a\n\r"
+        ser.write(command)  # write a string
+
+        ended = False
+        reply = b""
+
+        for _ in range(len(command)):
+            a = ser.read()  # Read the loopback chars and ignore
+
+        while True:
+            if time.time() > timeout:
+                break
+            a = ser.read()
+
+            if a == b"\r":
+                break
+
+            else:
+                reply += a
+
+            time.sleep(0.01)
+
+        ser.close()
 
         if reply == b"b":
             return True
@@ -108,9 +136,9 @@ def Read_Settings():
             "AutoGen": True,
             "comport": "",
             "multScreens": 1,
-            "MediaDelaySet": False,
-            "MediaDelay": 10000,
-            "MediaDelayFormat": "Sec",
+            "RefreshDelaySet": False,
+            "RefreshDelay": 10,
+            "RefreshDelayFormat": "Sec",
             "optionmenu1": "Media info",
             "optionmenu2": "Hacker mode",
         }
@@ -144,13 +172,15 @@ def Apply_Settings():
 
 def Send_Serial(port, data, ReturnOutput):
 
+    if port == "":
+        return False
+
     import time
     import serial
 
     ser = serial.Serial(port, 115200, timeout=1, write_timeout=1)  # open serial port
 
     command = f"{data}\n\r".encode("utf-8")
-    print(f"Sending Command: [{command}]")
     ser.write(command)  # write a string
 
     ended = False
@@ -180,6 +210,28 @@ def Send_Serial(port, data, ReturnOutput):
         return reply
     else:
         ser.close()
+
+
+def Playback_Service():
+    import RosePlayerPlaying as Playing
+    import threading
+    import json
+
+    Data = {}
+    Settings = Read_Settings()
+
+    PlayingData = Playing.GetPlaying()
+    Data["Mode"] = "Media"
+    Data["Title"] = PlayingData["title"]
+    Data["Artist"] = PlayingData["artist"]
+    Data["Album"] = PlayingData["album_title"]
+
+    Data = json.dumps(Data)
+
+    Send_Serial(Settings["comport"], Data, False)
+    print(Data)
+
+    threading.Timer(Settings["RefreshDelay"], Playback_Service).start()
 
 
 if __name__ == "__main__":

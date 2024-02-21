@@ -152,15 +152,15 @@ class GeneralManagement(customtkinter.CTkTabview):
             try:
                 DelayNum = int(DelayNum)
                 if DelayFormat == "Sec":
-                    Settings["MediaDelay"] = int(DelayNum * 1000)
+                    Settings["RefreshDelay"] = int(DelayNum)
                 elif DelayFormat == "Min":
-                    Settings["MediaDelay"] = int(DelayNum * 10000 * 60)
+                    Settings["RefreshDelay"] = int(DelayNum * 60)
                 elif DelayFormat == "Hour":
-                    Settings["MediaDelay"] = int(DelayNum * 10000 * 60 * 60)
+                    Settings["RefreshDelay"] = int(DelayNum * 60 * 60)
 
                 print(Settings)
-                Settings["MediaDelaySet"] = True
-                Settings["MediaDelayFormat"] = DelayFormat
+                Settings["RefreshDelaySet"] = True
+                Settings["RefreshDelayFormat"] = DelayFormat
 
                 Global.Write_Settings(Settings)
             except ValueError:
@@ -191,17 +191,15 @@ class GeneralManagement(customtkinter.CTkTabview):
             placeholder_text="A number",
             width=85,
         )
-        if Settings["MediaDelayFormat"] == "Sec":
-            self.MediaDelayEntry.insert(0, int(Settings["MediaDelay"] / 1000))
-        elif Settings["MediaDelayFormat"] == "Min":
-            self.MediaDelayEntry.insert(0, int(Settings["MediaDelay"] / 10000 / 60))
-        elif Settings["MediaDelayFormat"] == "Hour":
-            self.MediaDelayEntry.insert(
-                0, int(Settings["MediaDelay"] / 10000 / 60 / 60)
-            )
+        if Settings["RefreshDelayFormat"] == "Sec":
+            self.MediaDelayEntry.insert(0, int(Settings["RefreshDelay"]))
+        elif Settings["RefreshDelayFormat"] == "Min":
+            self.MediaDelayEntry.insert(0, int(Settings["RefreshDelay"] / 60))
+        elif Settings["RefreshDelayFormat"] == "Hour":
+            self.MediaDelayEntry.insert(0, int(Settings["RefreshDelay"] / 60 / 60))
 
         self.MediaDelayMenu_var = customtkinter.StringVar(
-            value=Settings["MediaDelayFormat"]
+            value=Settings["RefreshDelayFormat"]
         )
         self.MediaDelayMenu = customtkinter.CTkOptionMenu(
             master=self.tab("General Settings"),
@@ -218,11 +216,12 @@ class GeneralManagement(customtkinter.CTkTabview):
         )
 
         # add widgets on tab
-        self.Checkbox.grid(row=0, column=0, columnspan=2, padx=10)
+        self.Checkbox.grid(row=0, column=0, columnspan=2, padx=10, pady=20)
 
-        self.MediaDelayLabel.grid(row=1, column=0, pady=20)
-        self.MediaDelayEntry.grid(row=1, column=1, pady=20)
-        self.MediaDelayMenu.grid(row=1, column=2, pady=20)
+        self.MediaDelayLabel.grid(row=1, column=0, pady=0)
+        self.MediaDelayEntry.grid(row=1, column=1, pady=0)
+        self.MediaDelayMenu.grid(row=1, column=2, pady=0)
+        self.MediaDelayButton.grid(row=2, column=0, columnspan=3)
 
 
 class SaveMenu(customtkinter.CTkTabview):
@@ -240,7 +239,7 @@ class SaveMenu(customtkinter.CTkTabview):
 
         def ApplySettings():
             Settings = Global.Read_Settings()
-            Global.Apply_Settings(Settings)
+            Global.Apply_Settings()
 
             if Settings["comport"] == "":
                 if (
@@ -279,7 +278,7 @@ class App(customtkinter.CTk):
         super().__init__()
 
         self.title("Rose Player Manager")
-        self.geometry("1100x550")
+        self.geometry("1100x575")
         self.w = self.winfo_reqwidth()
         self.h = self.winfo_reqheight()
         self.ws = self.winfo_screenwidth()
@@ -312,10 +311,10 @@ class App(customtkinter.CTk):
         self.ScreenTabs = ScreenManagement(master=self)
         self.ScreenTabs.grid(row=0, column=1, padx=10, pady=10)
 
-        self.SettingsTabs = GeneralManagement(master=self, height=150)
+        self.SettingsTabs = GeneralManagement(master=self, height=160)
         self.SettingsTabs.grid(row=1, column=0, padx=10, pady=10)
 
-        self.SaveTabs = SaveMenu(master=self, height=150)
+        self.SaveTabs = SaveMenu(master=self, height=160)
         self.SaveTabs.grid(row=1, column=1, padx=10, pady=10)
 
 

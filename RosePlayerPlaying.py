@@ -69,7 +69,7 @@ def GetPlaying():
         current_media_info = get_media_info()
     elif platform == "win32":
         current_media_info = asyncio.run(get_media_info())
-    print(current_media_info)
+    return current_media_info
 
 
 if __name__ == "__main__":

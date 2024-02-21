@@ -16,11 +16,3 @@ python ImageDownscaler.py Images/src/ Images/ 1920 1080
 pyinstaller "RosePlayerManager.spec"
 
 call .venv\Scripts\deactivate.bat
-
-cd dist
-cd RosePlayerManager
-
-RosePlayerManager.exe
-
-cd ..
-cd ..
