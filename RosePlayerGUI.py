@@ -69,6 +69,7 @@ class ScreenManagement(customtkinter.CTkTabview):
 
         # create functions
         def CheckScreenAmount():
+            Settings = Global.Read_Settings()
             if Settings["multScreens"] == 1:
                 # couldn't find a "proper" way to check if the tab is present lol
                 try:
@@ -146,6 +147,7 @@ class GeneralManagement(customtkinter.CTkTabview):
                 Settings["multScreens"] = 1
             else:
                 Settings["multScreens"] = 0
+            print(Settings)
             Global.Write_Settings(Settings)
 
         def MediaDelayButtonAction():

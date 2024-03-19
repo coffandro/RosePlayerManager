@@ -16,6 +16,7 @@ else:
 state = ""
 
 Global.Search_Ports()
+Settings = Global.Read_Settings()
 
 
 def after_click(icon, query):
@@ -23,7 +24,9 @@ def after_click(icon, query):
         app = GUI.App()
         app.mainloop()
     elif str(query) == "Exit":
-        sys.exit(1)
+        Settings = Global.Read_Settings()
+        Settings["Running"] = False
+        # icon.stop()
 
 
 icon = pystray.Icon(

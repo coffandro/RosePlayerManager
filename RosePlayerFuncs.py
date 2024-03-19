@@ -134,9 +134,10 @@ def Read_Settings():
     except:
         settings = {
             "AutoGen": True,
+            "Running": True,
+            "RefreshDelaySet": False,
             "comport": "",
             "multScreens": 1,
-            "RefreshDelaySet": False,
             "RefreshDelay": 10,
             "RefreshDelayFormat": "Sec",
             "optionmenu1": "Media info",
@@ -171,45 +172,48 @@ def Apply_Settings():
 
 
 def Send_Serial(port, data, ReturnOutput):
+    if TestSerialPort(port):
 
-    if port == "":
-        return False
+        if port == "":
+            return False
 
-    import time
-    import serial
+        import time
+        import serial
 
-    ser = serial.Serial(port, 115200, timeout=1, write_timeout=1)  # open serial port
+        ser = serial.Serial(
+            port, 115200, timeout=1, write_timeout=1
+        )  # open serial port
 
-    command = f"{data}\n\r".encode("utf-8")
-    ser.write(command)  # write a string
+        command = f"{data}\n\r".encode("utf-8")
+        ser.write(command)  # write a string
 
-    ended = False
-    reply = b""
+        ended = False
+        reply = b""
 
-    for _ in range(len(command)):
-        a = ser.read()  # Read the loopback chars and ignore
+        for _ in range(len(command)):
+            a = ser.read()  # Read the loopback chars and ignore
 
-    if ReturnOutput:
-        timeout = time.time() + 1  # 1 Seconds from now
+        if ReturnOutput:
+            timeout = time.time() + 1  # 1 Seconds from now
 
-        while True:
-            if time.time() > timeout:
-                break
-            a = ser.read()
+            while True:
+                if time.time() > timeout:
+                    break
+                a = ser.read()
 
-            if a == b"\r":
-                break
+                if a == b"\r":
+                    break
 
-            else:
-                reply += a
+                else:
+                    reply += a
 
-            time.sleep(0.01)
+                time.sleep(0.01)
 
-        ser.close()
+            ser.close()
 
-        return reply
-    else:
-        ser.close()
+            return reply
+        else:
+            ser.close()
 
 
 OldPlaying = {}
@@ -223,20 +227,25 @@ def Playback_Service():
 
     Data = {}
     Settings = Read_Settings()
+    Disconnected = False
 
-    PlayingData = Playing.GetPlaying()
-    Data["Mode"] = "Media"
-    Data["Title"] = PlayingData["title"]
-    Data["Artist"] = PlayingData["artist"]
-    Data["Album"] = PlayingData["album_title"]
+    if Settings["Running"] == True:
+        PlayingData = Playing.GetPlaying()
+        Data["Mode"] = "Media"
+        Data["Title"] = PlayingData["title"]
+        Data["Artist"] = PlayingData["artist"]
+        Data["Album"] = PlayingData["album_title"]
 
-    Data = json.dumps(Data)
-    if Data != OldPlaying:
-        OldPlaying = Data
-        Send_Serial(Settings["comport"], Data, False)
-        print(Data)
+        Data = json.dumps(Data)
+        if TestSerialPort(Settings["comport"]):
+            if Data != OldPlaying or Disconnected == True:
+                OldPlaying = Data
+                Send_Serial(Settings["comport"], Data, False)
+                print(Data)
+        else:
+            Disconnected = True
 
-    threading.Timer(Settings["RefreshDelay"], Playback_Service).start()
+        threading.Timer(Settings["RefreshDelay"], Playback_Service).start()
 
 
 if __name__ == "__main__":
